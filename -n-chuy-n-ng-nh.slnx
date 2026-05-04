@@ -6,7 +6,6 @@
   <Project Path="Meta.XR.BuildingBlocks.csproj" />
   <Project Path="Unity.Mathematics.csproj" />
   <Project Path="Unity.Multiplayer.Center.Editor.csproj" />
-  <Project Path="Unity.Cinemachine.Editor.csproj" />
   <Project Path="Unity.XR.Simulation.csproj" />
   <Project Path="Unity.RenderPipelines.Universal.Editor.csproj" />
   <Project Path="Unity.VisualScripting.Core.Editor.csproj" />
@@ -32,7 +31,6 @@
   <Project Path="Unity.VisualScripting.Core.csproj" />
   <Project Path="UnityEditor.TestRunner.csproj" />
   <Project Path="Oculus.Interaction.OVR.csproj" />
-  <Project Path="Unity.Cinemachine.csproj" />
   <Project Path="Autodesk.Fbx.csproj" />
   <Project Path="Unity.RenderPipelines.Universal.Runtime.csproj" />
   <Project Path="Unity.Burst.CodeGen.csproj" />
@@ -43,7 +41,6 @@
   <Project Path="Unity.VisualScripting.Flow.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
   <Project Path="UnityEngine.TestRunner.csproj" />
-  <Project Path="Unity.Splines.Editor.csproj" />
   <Project Path="Unity.XR.ARFoundation.csproj" />
   <Project Path="Unity.PerformanceTesting.csproj" />
   <Project Path="Unity.TextMeshPro.csproj" />
@@ -65,6 +62,7 @@
   <Project Path="Unity.XR.CompositionLayers.Editor.csproj" />
   <Project Path="Unity.Rider.Editor.csproj" />
   <Project Path="Unity.XR.ARFoundation.VisualScripting.Editor.csproj" />
+  <Project Path="Cinemachine.csproj" />
   <Project Path="Meta.XR.Editor.TelemetryUI.csproj" />
   <Project Path="Unity.Animation.Rigging.Editor.csproj" />
   <Project Path="Unity.AI.Navigation.Updater.csproj" />
@@ -81,6 +79,7 @@
   <Project Path="Meta.XR.Editor.PlayCompanion.csproj" />
   <Project Path="Meta.XR.Editor.Reflection.csproj" />
   <Project Path="Unity.VisualScripting.State.csproj" />
+  <Project Path="com.unity.cinemachine.editor.csproj" />
   <Project Path="Meta.WitAi.TTS.csproj" />
   <Project Path="Meta.XR.ImmersiveDebugger.Editor.csproj" />
   <Project Path="Unity.XR.CoreUtils.Editor.csproj" />
@@ -115,7 +114,6 @@
   <Project Path="Unity.XR.MetaOpenXR.csproj" />
   <Project Path="Meta.XR.Editor.Id.csproj" />
   <Project Path="Unity.XR.MetaOpenXR.Editor.csproj" />
-  <Project Path="Unity.Settings.Editor.csproj" />
   <Project Path="Meta.XR.Audio.csproj" />
   <Project Path="VoiceSDK.Editor.Composer.csproj" />
   <Project Path="Unity.InputSystem.TestFramework.csproj" />
@@ -127,7 +125,6 @@
   <Project Path="VoiceSDK.Telemetry.Runtime.csproj" />
   <Project Path="UnityEditor.UI.Analytics.csproj" />
   <Project Path="Unity.EditorCoroutines.Editor.csproj" />
-  <Project Path="Unity.Splines.csproj" />
   <Project Path="Unity.AI.Navigation.csproj" />
   <Project Path="Unity.XR.ARFoundation.Editor.csproj" />
   <Project Path="Meta.Voice.Hub.Runtime.csproj" />
