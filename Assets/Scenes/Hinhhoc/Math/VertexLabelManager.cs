@@ -11,27 +11,21 @@ public class VertexLabelManager : MonoBehaviour
     public Color textColor = Color.white;
 
     private Dictionary<GameObject, List<GameObject>> labelMap = new Dictionary<GameObject, List<GameObject>>();
-    private ObjectInteraction interaction;
-
+    private HandGestureInteraction handController;
     private static readonly string[] LABELS = { "A", "B", "C", "D", "E", "F", "G", "H" };
 
     void Start()
     {
-        interaction = FindObjectOfType<ObjectInteraction>();
+        handController = FindObjectOfType<HandGestureInteraction>();
     }
 
     void Update()
     {
-        if (interaction == null) return;
-
-        // Nhấn V → bật/tắt nhãn đỉnh
+        if (handController == null) return;
         if (Input.GetKeyDown(KeyCode.V))
         {
-            GeometryObject selected = interaction.GetSelectedObject();
-            if (selected != null)
-            {
-                ToggleLabels(selected.gameObject);
-            }
+            GeometryObject selected = handController.GetSelectedObject();
+            if (selected != null) ToggleLabels(selected.gameObject);
         }
     }
 

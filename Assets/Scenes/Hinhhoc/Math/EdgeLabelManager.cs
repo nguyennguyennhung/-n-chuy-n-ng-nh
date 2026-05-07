@@ -11,28 +11,23 @@ public class EdgeLabelManager : MonoBehaviour
     public Color edgeNameColor = new Color(1f, 0.85f, 0f); // Vàng
 
     private Dictionary<GameObject, List<GameObject>> labelMap = new Dictionary<GameObject, List<GameObject>>();
-    private ObjectInteraction interaction;
+    private HandGestureInteraction handController;
 
     void Start()
     {
-        interaction = FindObjectOfType<ObjectInteraction>();
+        handController = FindObjectOfType<HandGestureInteraction>();
     }
 
     void Update()
     {
-        if (interaction == null) return;
+        // KHÔNG check handController == null ở đây — UpdateLabelScales phải chạy
 
-        // Nhấn L → bật/tắt ký hiệu cạnh
-        if (Input.GetKeyDown(KeyCode.L))
+        if (handController != null && Input.GetKeyDown(KeyCode.L))
         {
-            GeometryObject selected = interaction.GetSelectedObject();
-            if (selected != null)
-            {
-                ToggleEdgeLabels(selected.gameObject);
-            }
+            GeometryObject selected = handController.GetSelectedObject();
+            if (selected != null) ToggleEdgeLabels(selected.gameObject);
         }
-
-        UpdateLabelScales();
+        UpdateLabelScales();   // ← Phải chạy độc lập
     }
 
     void UpdateLabelScales()

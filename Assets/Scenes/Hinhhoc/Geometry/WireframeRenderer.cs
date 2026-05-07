@@ -28,30 +28,28 @@ public class WireframeRenderer : MonoBehaviour
         = new Dictionary<GameObject, List<LineRenderer>>();
 
     // Tham chiếu đến ObjectInteraction để biết khối nào đang chọn
-    private ObjectInteraction interaction;
+    
+
+    private HandGestureInteraction handController;
 
     void Start()
     {
-        interaction = FindObjectOfType<ObjectInteraction>();
+        handController = FindObjectOfType<HandGestureInteraction>();
     }
 
     void Update()
     {
-        if (interaction == null) return;
+        // Bỏ check `if (interaction == null) return;` 
+        // Vì SyncColors() phải chạy độc lập với việc có chọn khối hay không
 
-        // Nhấn W → bật/tắt wireframe cho khối đang chọn
-        if (Input.GetKeyDown(KeyCode.W))
+        // Phím W để fallback debug — chỉ chạy khi handController có
+        if (handController != null && Input.GetKeyDown(KeyCode.W))
         {
-            GeometryObject selected = interaction.GetSelectedObject();
-            if (selected != null)
-            {
-                ToggleWireframe(selected.gameObject);
-            }
+            GeometryObject selected = handController.GetSelectedObject();
+            if (selected != null) ToggleWireframe(selected.gameObject);
         }
 
-        // CẬP NHẬT MÀU SẮC THỜI GIAN THỰC
-        // Giúp người dùng thấy thay đổi ngay lập tức khi chỉnh màu trong Inspector
-        SyncColors();
+        SyncColors();   // ← Bây giờ chạy được
     }
 
     /// <summary>
@@ -77,8 +75,9 @@ public class WireframeRenderer : MonoBehaviour
 
     /// <summary>
     /// Bật/tắt wireframe cho một khối.
+    /// (Public để HandGestureInteraction gọi được khi học sinh poke nút "Cạnh khối".)
     /// </summary>
-    void ToggleWireframe(GameObject target)
+    public void ToggleWireframe(GameObject target)
     {
         if (wireframeMap.ContainsKey(target))
         {
