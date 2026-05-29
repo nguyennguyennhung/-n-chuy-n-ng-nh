@@ -17,6 +17,10 @@ public class GeometryObject : MonoBehaviour
     public bool isSelected = false;      // Đang được chọn hay không?
     public bool isTransparent = false;   // Đang trong suốt hay không?
 
+    [Header("Màu hiệu ứng")]
+    [Tooltip("Màu khối khi đang được chọn/nắm (highlight). Mặc định = vàng.")]
+    public Color grabColor = new Color(1f, 0.9f, 0.1f); // Vàng sáng
+
     // ===== BIẾN NỘI BỘ =====
     // Lưu lại màu gốc để khi bỏ chọn thì trả về màu cũ
     private Color originalColor;
@@ -52,7 +56,8 @@ public class GeometryObject : MonoBehaviour
         Renderer rend = GetComponent<Renderer>();
         if (rend != null && rend.material != null)
         {
-            originalColor = rend.material.color;
+            // URP dùng _BaseColor thay vì .color
+            originalColor = rend.material.GetColor("_BaseColor");
         }
     }
 
@@ -67,10 +72,14 @@ public class GeometryObject : MonoBehaviour
         Renderer rend = GetComponent<Renderer>();
         if (rend != null)
         {
-            // Bật chế độ phát sáng (emission) = khối sáng lên
+            // Đổi màu sang grabColor (URP: dùng _BaseColor)
+            Color c = grabColor;
+            if (isTransparent) c.a = 0.3f;  // Giữ độ trong suốt nếu đang transparent
+            rend.material.SetColor("_BaseColor", c);
+
+            // Bật phát sáng (emission) để khối sáng rực
             rend.material.EnableKeyword("_EMISSION");
-            // Màu phát sáng = màu gốc nhưng nhạt hơn (nhân 0.4)
-            rend.material.SetColor("_EmissionColor", originalColor * 0.4f);
+            rend.material.SetColor("_EmissionColor", grabColor * 0.35f);
         }
     }
 
@@ -85,6 +94,11 @@ public class GeometryObject : MonoBehaviour
         Renderer rend = GetComponent<Renderer>();
         if (rend != null)
         {
+            // Trả lại màu gốc (URP: dùng _BaseColor)
+            Color c = originalColor;
+            if (isTransparent) c.a = 0.3f;  // Giữ độ trong suốt nếu đang transparent
+            rend.material.SetColor("_BaseColor", c);
+
             // Tắt phát sáng
             rend.material.DisableKeyword("_EMISSION");
             rend.material.SetColor("_EmissionColor", Color.black);

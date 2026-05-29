@@ -127,12 +127,4 @@ public class VertexLabelManager : MonoBehaviour
         }
     }
 }
-
-public class BillboardLabel : MonoBehaviour
-{
-    void LateUpdate()
-    {
-        if (Camera.main != null)
-            transform.LookAt(transform.position + Camera.main.transform.forward);
-    }
-}
+// BillboardLabel đã được tách ra file riêng: Assets/Scenes/Hinhhoc/Interaction/BillboardLabel.cs

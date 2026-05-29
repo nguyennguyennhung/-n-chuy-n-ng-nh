@@ -121,6 +121,7 @@ MonoBehaviour:
   shapeName: "L\u1EADp ph\u01B0\u01A1ng"
   isSelected: 0
   isTransparent: 0
+  grabColor: {r: 1, g: 0.9, b: 0.1, a: 1}
 --- !u!1 &4442940841745090566
 GameObject:
   m_ObjectHideFlags: 0
@@ -171,10 +172,6 @@ GameObject:
   - component: {fileID: 6533683152537930605}
   - component: {fileID: 7359455457555028089}
   - component: {fileID: 2847858633296000744}
-  - component: {fileID: 6213486043321259340}
-  - component: {fileID: 5120412091309797845}
-  - component: {fileID: 9078937024686055257}
-  - component: {fileID: 1973141965887616137}
   m_Layer: 0
   m_Name: Chop
   m_TagString: Untagged
@@ -299,94 +296,7 @@ MonoBehaviour:
   shapeName: "H\xECnh ch\xF3p"
   isSelected: 0
   isTransparent: 0
---- !u!64 &6213486043321259340
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4601461886514754564}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 0}
---- !u!64 &5120412091309797845
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4601461886514754564}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 0}
---- !u!64 &9078937024686055257
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4601461886514754564}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 0}
---- !u!64 &1973141965887616137
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4601461886514754564}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 0}
+  grabColor: {r: 1, g: 0.9, b: 0.1, a: 1}
 --- !u!1 &6334662508638558776
 GameObject:
   m_ObjectHideFlags: 0
@@ -487,7 +397,7 @@ SphereCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -508,6 +418,7 @@ MonoBehaviour:
   shapeName: "Kh\u1ED1i h\xECnh"
   isSelected: 0
   isTransparent: 0
+  grabColor: {r: 1, g: 0.9, b: 0.1, a: 1}
 --- !u!1 &8854950522181571235
 GameObject:
   m_ObjectHideFlags: 0
@@ -631,6 +542,7 @@ MonoBehaviour:
   shapeName: "Kh\u1ED1i h\xECnh"
   isSelected: 0
   isTransparent: 0
+  grabColor: {r: 1, g: 0.9, b: 0.1, a: 1}
 --- !u!1 &8879015679622637214
 GameObject:
   m_ObjectHideFlags: 0
@@ -645,9 +557,6 @@ GameObject:
   - component: {fileID: 8737283463601431929}
   - component: {fileID: 1700552347998563900}
   - component: {fileID: 3553848099457815866}
-  - component: {fileID: 3042466339578495153}
-  - component: {fileID: 2032824577876677911}
-  - component: {fileID: 380215316540440193}
   m_Layer: 0
   m_Name: Non
   m_TagString: Untagged
@@ -773,69 +682,4 @@ MonoBehaviour:
   shapeName: "H\xECnh n\xF3n"
   isSelected: 0
   isTransparent: 0
---- !u!64 &3042466339578495153
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8879015679622637214}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 0}
---- !u!64 &2032824577876677911
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8879015679622637214}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 0}
---- !u!64 &380215316540440193
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8879015679622637214}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 0}
+  grabColor: {r: 1, g: 0.9, b: 0.1, a: 1}

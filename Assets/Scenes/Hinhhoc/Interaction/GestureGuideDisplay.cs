@@ -45,9 +45,12 @@ public class GestureGuideDisplay : MonoBehaviour
     public Color textColor = Color.white;
     public Color backgroundColor = new Color(0.05f, 0.05f, 0.1f, 0.9f);
 
-    [Header("Tự động ẩn (tùy chọn)")]
-    [Tooltip("Tự ẩn bảng sau X giây để không che khối hình. Đặt 0 = không tự ẩn.")]
-    public float autoHideAfterSeconds = 0f;
+    [Header("Hiển thị & Tự động ẩn")]
+    [Tooltip("Bỏ tick ở đây nếu KHÔNG muốn hiện bảng hướng dẫn ngay khi scene bắt đầu.")]
+    public bool showOnStart = true;
+
+    [Tooltip("Tự ẩn bảng sau X giây để không che khối hình. Đặt 0 = không tự ẩn.\nGiá trị gợi ý: 8 giây (đủ để học sinh đọc xong).")]
+    public float autoHideAfterSeconds = 8f;
 
     private GameObject panel;
 
@@ -55,9 +58,26 @@ public class GestureGuideDisplay : MonoBehaviour
     {
         BuildGuidePanel();
 
+        // Ẩn ngay nếu showOnStart = false
+        if (!showOnStart)
+        {
+            HideGuide();
+            return;
+        }
+
         // Tự ẩn sau X giây (nếu autoHideAfterSeconds > 0)
         if (autoHideAfterSeconds > 0f)
             Invoke(nameof(HideGuide), autoHideAfterSeconds);
+    }
+
+    void Update()
+    {
+        // Nhấn Space (khi test trên PC/Simulator) để bật/tắt bảng hướng dẫn
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if (panel != null && panel.activeSelf) HideGuide();
+            else ShowGuide();
+        }
     }
 
     void BuildGuidePanel()

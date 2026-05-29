@@ -126,6 +126,10 @@ public class HandWristMenu : MonoBehaviour
     {
         if (gestureController == null) return;
 
+        // Không poke menu khi tay phải đang kéo khối — tránh bấm nhầm
+        if (gestureController.IsRightPinching() && gestureController.GetSelectedObject() != null)
+            return;
+
         for (int i = 0; i < buttons.Count; i++)
         {
             GameObject btn = buttons[i];

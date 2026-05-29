@@ -66,22 +66,20 @@ public class HandGestureInteraction : MonoBehaviour
     private GeometryObject selectedObject;     // Khối đang được chọn
     private bool wasRightPinching, wasLeftPinching;
 
-    // Drag (cử chỉ #2)
+    // Kéo thả (1 tay bất kỳ)
+    private Transform grabTip; 
     private Vector3 dragOffset;
 
-    // Rotate (cử chỉ #3): mốc cổ tay khi bắt đầu pinch trái
-    private Quaternion leftWristRefRotation;
-    private bool leftRotateActive;
-
-    // Scale (cử chỉ #4): khoảng cách 2 đầu ngón khi bắt đầu pinch cả 2 tay
-    private float bimanualBaseDistance;
+    // Thao tác 2 tay (Scale & Rotate)
+    private bool bimanualActive;
+    private float bimanualStartTime;
+    private Transform freeTip;           // Ngón tay thứ 2 (dùng để điều khiển)
+    private Vector3 freeTipStartPos;     // Vị trí bắt đầu của tay thứ 2
     private Vector3 bimanualBaseScale;
-    private bool bimanualScaleActive;
+    private Quaternion bimanualBaseRot;
 
     // Cache bone đầu ngón trỏ
     private Transform rightIndexTip, leftIndexTip;
-    // Cache bone cổ tay (cho rotate)
-    private Transform leftWrist;
 
     void Update()
     {
@@ -91,130 +89,116 @@ public class HandGestureInteraction : MonoBehaviour
 
         if (rightIndexTip == null) rightIndexTip = FindBone(rightSkeleton, OVRSkeleton.BoneId.Hand_IndexTip);
         if (leftIndexTip == null) leftIndexTip = FindBone(leftSkeleton, OVRSkeleton.BoneId.Hand_IndexTip);
-        if (leftWrist == null) leftWrist = FindBone(leftSkeleton, OVRSkeleton.BoneId.Hand_WristRoot);
 
         // === 2) PINCH STATE ===
-        // Pitfall: Meta XR Simulator KHÔNG gửi giá trị qua GetFingerPinchStrength.
-        // ⇒ Tự tính pinch theo khoảng cách thumb-index bone (hoạt động cả Quest thật lẫn Simulator).
         float rightPinchVal = ComputePinch(rightHand, rightSkeleton);
         float leftPinchVal = ComputePinch(leftHand, leftSkeleton);
         bool rightPinch = rightOK && rightPinchVal >= pinchThreshold;
         bool leftPinch = leftOK && leftPinchVal >= pinchThreshold;
 
-        // === 3) BIMANUAL SCALE — ưu tiên cao nhất (cử chỉ #4) ===
-        // Khi cả 2 tay đang pinch + có khối được chọn ⇒ scale theo khoảng cách 2 đầu ngón.
-        // Pitfall: nếu 2 tay quá gần (<10cm) Quest hay nhầm pinch ⇒ tạm bỏ qua frame đó.
-        if (rightPinch && leftPinch && selectedObject != null
-            && rightIndexTip != null && leftIndexTip != null)
+        // === 3) THAO TÁC 2 TAY: SCALE & ROTATE (Kiểu Joystick cực dễ) ===
+        if (rightPinch && leftPinch && selectedObject != null && rightIndexTip != null && leftIndexTip != null)
         {
-            float dist = Vector3.Distance(rightIndexTip.position, leftIndexTip.position);
-            if (dist < 0.1f)
+            if (!bimanualActive)
             {
-                bimanualScaleActive = false;   // Đợi 2 tay tách ra
+                // Xác định tay nào là tay gắp, tay nào là tay tự do
+                freeTip = (grabTip == rightIndexTip) ? leftIndexTip : rightIndexTip;
+                if (freeTip == null) freeTip = leftIndexTip; // Fallback an toàn
+                
+                freeTipStartPos = freeTip.position;
+                bimanualBaseScale = selectedObject.transform.localScale;
+                bimanualBaseRot = selectedObject.transform.rotation;
+                bimanualActive = true;
+                bimanualStartTime = Time.time;
             }
             else
             {
-                if (!bimanualScaleActive)
-                {
-                    bimanualBaseDistance = dist;
-                    bimanualBaseScale = selectedObject.transform.localScale;
-                    bimanualScaleActive = true;
-                }
-                else
-                {
-                    float ratio = dist / bimanualBaseDistance;
-                    Vector3 newScale = bimanualBaseScale * ratio;
-                    float clamped = Mathf.Clamp(newScale.x, scaleMin, scaleMax);
-                    selectedObject.transform.localScale = Vector3.one * clamped;
-                }
+                // Tính khoảng cách tay tự do di chuyển so với lúc mới bấm
+                Vector3 delta = freeTip.position - freeTipStartPos;
+
+                // Kéo tay LÊN/XUỐNG để Phóng to / Thu nhỏ (10cm = x1.3)
+                float scaleMultiplier = 1f + (delta.y * 3f); 
+                float clampedScale = Mathf.Clamp((bimanualBaseScale * scaleMultiplier).x, scaleMin, scaleMax);
+                selectedObject.transform.localScale = Vector3.one * clampedScale;
+
+                // Kéo tay TRÁI/PHẢI để Xoay khối (Xoay quanh trục Y)
+                float rotAngle = delta.x * -300f; // Kéo sang phải -> xoay phải
+                selectedObject.transform.rotation = Quaternion.Euler(0, rotAngle, 0) * bimanualBaseRot;
             }
             wasRightPinching = wasLeftPinching = true;
-            return;   // Đang scale thì không xử lý select/rotate (tránh chồng cử chỉ).
-        }
-        else
-        {
-            bimanualScaleActive = false;
+            return;
         }
 
-        // === 4) RIGHT PINCH — SELECT + DRAG (cử chỉ #1, #2, #9) ===
-        if (rightOK && rightIndexTip != null)
+        // Nếu vừa nhả 1 tay ra khỏi trạng thái 2 tay
+        if (bimanualActive && (!rightPinch || !leftPinch))
         {
-            // Cạnh xuống pinch (vừa pinch) → thử chọn khối.
-            if (rightPinch && !wasRightPinching) TrySelectAtRightFinger();
+            // TÀNG HÌNH KHỐI: Bấm nhấp tay thứ 2 thật nhanh (< 0.3s)
+            if (Time.time - bimanualStartTime < 0.3f && selectedObject != null)
+            {
+                selectedObject.ToggleTransparency();
+            }
 
-            // Đang giữ pinch + có khối → kéo theo đầu ngón.
-            if (rightPinch && selectedObject != null) DragSelected();
+            bimanualActive = false;
+            
+            // Cập nhật lại mốc kéo cho tay đang giữ khối để khối không bị giật
+            if (rightPinch) grabTip = rightIndexTip;
+            else if (leftPinch) grabTip = leftIndexTip;
+            else grabTip = null;
+
+            if (grabTip != null && selectedObject != null)
+                dragOffset = selectedObject.transform.position - grabTip.position;
         }
+
+        // === 4) THAO TÁC 1 TAY BẤT KỲ: CHỌN & KÉO ===
+        if (!bimanualActive)
+        {
+            // Bắt khối
+            if (rightPinch && !wasRightPinching && rightIndexTip != null) TryGrab(rightIndexTip);
+            else if (leftPinch && !wasLeftPinching && leftIndexTip != null) TryGrab(leftIndexTip);
+
+            // Kéo khối (di chuyển)
+            if (selectedObject != null)
+            {
+                if (grabTip == rightIndexTip && !rightPinch) DeselectCurrent();
+                else if (grabTip == leftIndexTip && !leftPinch) DeselectCurrent();
+                else if (grabTip != null) DragSelected();
+            }
+        }
+
         wasRightPinching = rightPinch;
-
-        // === 5) LEFT PINCH — ROTATE (cử chỉ #3) ===
-        // Khi vừa pinch trái + có khối được chọn → mốc cổ tay; sau đó cổ tay xoay
-        // khoảng nào quanh Y, khối xoay khoảng đó.
-        if (leftOK && selectedObject != null && leftWrist != null)
-        {
-            if (leftPinch && !wasLeftPinching)
-            {
-                leftWristRefRotation = leftWrist.rotation;
-                leftRotateActive = true;
-            }
-            else if (!leftPinch && wasLeftPinching)
-            {
-                leftRotateActive = false;
-            }
-
-            if (leftRotateActive && leftPinch)
-            {
-                Quaternion delta = leftWrist.rotation * Quaternion.Inverse(leftWristRefRotation);
-                float yawDeg = delta.eulerAngles.y;
-                if (yawDeg > 180f) yawDeg -= 360f;   // Chuyển về [-180,180]
-
-                selectedObject.transform.Rotate(Vector3.up, yawDeg * rotateSensitivity * Time.deltaTime, Space.World);
-            }
-        }
-        else
-        {
-            leftRotateActive = false;
-        }
         wasLeftPinching = leftPinch;
     }
 
     // ====================================================
-    // CỬ CHỈ #1, #9: chọn khối / bỏ chọn khi pinch phải
+    // CỬ CHỈ GẮP KHỐI BẰNG TAY BẤT KỲ
     // ====================================================
-    void TrySelectAtRightFinger()
+    void TryGrab(Transform tip)
     {
-        // 1. Overlap sphere — chạm trực tiếp
-        Collider[] hits = Physics.OverlapSphere(rightIndexTip.position, pinchSelectRadius);
-        if (debugMode) Debug.Log($"[HandGesture] PINCH! tipPos={rightIndexTip.position} hits={hits.Length}");
-
+        // 1. Chạm trực tiếp
+        Collider[] hits = Physics.OverlapSphere(tip.position, pinchSelectRadius);
         foreach (Collider c in hits)
         {
             GeometryObject geo = c.GetComponent<GeometryObject>();
-            if (debugMode) Debug.Log($"[HandGesture]   hit collider '{c.name}' geometryObject={(geo != null)}");
             if (geo != null)
             {
-                SelectObject(geo);
-                dragOffset = geo.transform.position - rightIndexTip.position;
+                SelectObject(geo, tip);
                 return;
             }
         }
 
-        // 2. Raycast forward — chọn khối ở xa (Distance Grab nhẹ)
-        Ray ray = new Ray(rightIndexTip.position, rightIndexTip.forward);
+        // 2. Chạm từ xa (Raycast)
+        Ray ray = new Ray(tip.position, tip.forward);
         if (Physics.Raycast(ray, out RaycastHit hit, pinchRayDistance))
         {
             GeometryObject geo = hit.collider.GetComponent<GeometryObject>();
-            if (debugMode) Debug.Log($"[HandGesture] RAY hit '{hit.collider.name}' geometryObject={(geo != null)}");
             if (geo != null)
             {
-                SelectObject(geo);
-                dragOffset = geo.transform.position - hit.point;
+                SelectObject(geo, tip);
                 return;
             }
         }
-        else if (debugMode) Debug.Log("[HandGesture] RAY miss — không có collider trên đường đi");
 
-        // 3. Pinch vào không trung → bỏ chọn (cử chỉ #9)
+        // 3. Pinch vào không trung → bỏ chọn
         DeselectCurrent();
     }
 
@@ -223,7 +207,8 @@ public class HandGestureInteraction : MonoBehaviour
     // ====================================================
     void DragSelected()
     {
-        Vector3 target = rightIndexTip.position + dragOffset;
+        if (grabTip == null) return;
+        Vector3 target = grabTip.position + dragOffset;
         Rigidbody rb = selectedObject.GetComponent<Rigidbody>();
         if (rb != null && rb.isKinematic) rb.MovePosition(target);
         else selectedObject.transform.position = target;
@@ -232,10 +217,12 @@ public class HandGestureInteraction : MonoBehaviour
     // ====================================================
     // SELECT / DESELECT
     // ====================================================
-    void SelectObject(GeometryObject geo)
+    void SelectObject(GeometryObject geo, Transform tip)
     {
         if (selectedObject != null && selectedObject != geo) selectedObject.Deselect();
         selectedObject = geo;
+        grabTip = tip;
+        dragOffset = selectedObject.transform.position - tip.position;
         selectedObject.Select();
     }
 
@@ -243,12 +230,16 @@ public class HandGestureInteraction : MonoBehaviour
     {
         if (selectedObject != null) selectedObject.Deselect();
         selectedObject = null;
+        grabTip = null;
     }
 
     // ====================================================
     // PUBLIC API — cho Wrist Menu (cử chỉ #5–#8) gọi vào
     // ====================================================
     public GeometryObject GetSelectedObject() => selectedObject;
+
+    /// <summary>Trả về true nếu tay phải đang pinch (dùng để WristMenu tránh poke nhầm khi đang kéo khối).</summary>
+    public bool IsRightPinching() => wasRightPinching;
 
     /// <summary>Cử chỉ #5: poke nút "Trong suốt".</summary>
     public void InvokeToggleTransparency()
@@ -299,7 +290,10 @@ public class HandGestureInteraction : MonoBehaviour
     {
         if (hand == null) return 0f;
 
-        // Nguồn 1: API chính thức
+        // Nguồn 0: Boolean từ API (Hoạt động hoàn hảo trong Meta XR Simulator khi bấm phím Pinch)
+        if (hand.GetFingerIsPinching(OVRHand.HandFinger.Index)) return 1.0f;
+
+        // Nguồn 1: API chính thức (Pinch Strength)
         float api = hand.GetFingerPinchStrength(OVRHand.HandFinger.Index);
         if (api > 0.05f) return api;
 
