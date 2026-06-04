@@ -77,4 +77,10 @@ public class ShapeTouchTransparency : MonoBehaviour
         mat.EnableKeyword("_ALPHABLEND_ON");
         mat.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
     }
+
+    private void OnDestroy()
+    {
+        // ★ FIX: rend.material clone runtime — phải Destroy thủ công để không leak GPU asset.
+        if (runtimeMat != null) Destroy(runtimeMat);
+    }
 }

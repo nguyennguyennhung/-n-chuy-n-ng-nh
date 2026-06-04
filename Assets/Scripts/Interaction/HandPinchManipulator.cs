@@ -55,6 +55,13 @@ public class HandPinchManipulator : MonoBehaviour
 
     private void Awake()
     {
+        // ★ FIX: chống IndexOutOfRange khi scaleSteps rỗng / defaultScaleIndex sai trong Inspector.
+        if (scaleSteps == null || scaleSteps.Length == 0)
+        {
+            scaleSteps = new[] { 0.5f, 0.75f, 1.0f, 1.5f, 2.0f };
+        }
+        defaultScaleIndex = Mathf.Clamp(defaultScaleIndex, 0, scaleSteps.Length - 1);
+
         baseScale = transform.localScale / Mathf.Max(0.001f, scaleSteps[defaultScaleIndex]);
         transform.localScale = baseScale * scaleSteps[defaultScaleIndex];
     }

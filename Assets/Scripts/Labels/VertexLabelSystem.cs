@@ -9,13 +9,17 @@ public class VertexLabelSystem : MonoBehaviour
     public void CreateLabels(ShapeDefinition shape)
     {
         Clear();
+        if (shape == null || shape.vertices == null) return;
 
-        for (int i = 0; i < shape.vertices.Length; i++)
+        // ★ FIX: trước đây giả định labels.Length == vertices.Length — sai sẽ IndexOutOfRange.
+        int n = shape.labels != null
+            ? Mathf.Min(shape.vertices.Length, shape.labels.Length)
+            : shape.vertices.Length;
+
+        for (int i = 0; i < n; i++)
         {
-            CreateLabel(
-                shape.labels[i],
-                shape.vertices[i]
-            );
+            string txt = shape.labels != null ? shape.labels[i] : ((char)('A' + i)).ToString();
+            CreateLabel(txt, shape.vertices[i]);
         }
     }
 

@@ -7,17 +7,16 @@ public class GeometryVisualizationController : MonoBehaviour
 
     void Start()
     {
-        renderer3D =
-            GetComponent<GeometryRenderer>();
+        renderer3D = GetComponent<GeometryRenderer>();
+        labels = GetComponent<VertexLabelSystem>();
 
-        labels =
-            GetComponent<VertexLabelSystem>();
+        ShapeDefinition cube = ShapeLibrary.CreateCube();
 
-        ShapeDefinition cube =
-            ShapeLibrary.CreateCube();
+        // ★ FIX: thiếu component sẽ NRE — log rõ thay vì crash.
+        if (renderer3D == null) Debug.LogError("[GeometryViz] GeometryRenderer chưa được gắn cùng GameObject.", this);
+        else renderer3D.Render(cube);
 
-        renderer3D.Render(cube);
-
-        labels.CreateLabels(cube);
+        if (labels == null) Debug.LogError("[GeometryViz] VertexLabelSystem chưa được gắn cùng GameObject.", this);
+        else labels.CreateLabels(cube);
     }
 }

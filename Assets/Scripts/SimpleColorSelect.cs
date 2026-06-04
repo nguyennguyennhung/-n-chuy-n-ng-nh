@@ -11,25 +11,25 @@ public class SimpleColorSelect : MonoBehaviour
     void Start()
     {
         rend = GetComponent<Renderer>();
+        if (rend == null) { enabled = false; return; }
 
-        originalColor = rend.material.GetColor("_BaseColor");
+        // ★ FIX: không phải shader nào cũng có _BaseColor (Built-in dùng _Color).
+        Material m = rend.material;
+        if (m.HasProperty("_BaseColor"))      originalColor = m.GetColor("_BaseColor");
+        else if (m.HasProperty("_Color"))     originalColor = m.color;
+        else                                  originalColor = Color.white;
     }
 
     public void ToggleSelect()
     {
+        if (rend == null) return;
         selected = !selected;
 
-        if (selected)
-        {
-            rend.material.SetColor("_BaseColor", Color.yellow);
+        Color target = selected ? Color.yellow : originalColor;
+        Material m = rend.material;
+        if (m.HasProperty("_BaseColor")) m.SetColor("_BaseColor", target);
+        if (m.HasProperty("_Color"))     m.color = target;
 
-            Debug.Log("SELECT");
-        }
-        else
-        {
-            rend.material.SetColor("_BaseColor", originalColor);
-
-            Debug.Log("DESELECT");
-        }
+        Debug.Log(selected ? "SELECT" : "DESELECT");
     }
 }

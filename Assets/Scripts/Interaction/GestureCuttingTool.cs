@@ -120,13 +120,22 @@ public class GestureCuttingTool : MonoBehaviour
             }
         }
         // CASE 3: Tay phải đang pinch → preview cut
+        // ★ FIX: chỉ vẽ lại khi mục tiêu snap thay đổi — tránh tạo hàng trăm LineRenderer/frame
         else if (rightPinch && currentConfirmed == null)
         {
-            currentPreview = FindBestSnap();
-            if (currentPreview != null && crossSectionRenderer != null)
+            CrossSectionDefinition next = FindBestSnap();
+            if (next != currentPreview)
             {
-                crossSectionRenderer.outlineColor = previewColor;
-                crossSectionRenderer.Draw(currentPreview);
+                currentPreview = next;
+                if (currentPreview != null && crossSectionRenderer != null)
+                {
+                    crossSectionRenderer.outlineColor = previewColor;
+                    crossSectionRenderer.Draw(currentPreview);
+                }
+                else if (currentPreview == null)
+                {
+                    crossSectionRenderer?.Clear();
+                }
             }
         }
         // CASE 4: Tay phải nhả khi đang preview → clear preview
